@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 import pickle
 import json
+from sklearn import preprocessing
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -62,8 +63,22 @@ def _preprocess_data(data):
     
 
     feature_vector_df = feature_vector_df[(feature_vector_df['Commodities'] == 'APPLE GOLDEN DELICIOUS')]
-    predict_vector = feature_vector_df[['Total_Qty_Sold','Stock_On_Hand']]
-                                
+    predict_vector = feature_vector_df
+    predict_vector = predict_vector.reset_index(drop=True)
+    predict_vector.drop('Commodities',axis = 1, inplace = True)   
+    predict_vector['Date'] = predict_vector['Date'].apply(lambda x: pd.to_datetime(x))
+    predict_vector['Day'] = predict_vector['Date'].dt.day
+    predict_vector['Month'] = predict_vector['Date'].dt.month
+    predict_vector['Year'] = predict_vector['Date'].dt.year
+    predict_vector.drop('Date', axis = 1, inplace = True)   
+    label_encoder = preprocessing.LabelEncoder()
+
+    # Encode labels in column 'Size_Grade' in training data. 
+    predict_vector['Size_Grade']= label_encoder.fit_transform(predict_vector['Size_Grade']) 
+
+    # Encode labels in column 'Container' in training data
+    predict_vector['Container']= label_encoder.fit_transform(predict_vector['Container'])   
+    predict_vector = pd.get_dummies(predict_vector, drop_first=True)                   
     # ------------------------------------------------------------------------
 
     return predict_vector
