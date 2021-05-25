@@ -21,11 +21,29 @@
 import requests
 import pandas as pd
 import numpy as np
+from sklearn import preprocessing
 
 # Load data from file to send as an API POST request.
 # We prepare a DataFrame with the public test set 
 # from the Kaggle challenge.
-test = pd.read_csv('data/test_data.csv')
+feature_vector_df = pd.read_csv('data/test_data.csv')
+feature_vector_df = feature_vector_df[(feature_vector_df['Commodities'] == 'APPLE GOLDEN DELICIOUS')]
+predict_vector = feature_vector_df
+predict_vector = predict_vector.reset_index(drop=True)
+predict_vector.drop('Commodities',axis = 1, inplace = True)   
+predict_vector['Date'] = predict_vector['Date'].apply(lambda x: pd.to_datetime(x))
+predict_vector['Day'] = predict_vector['Date'].dt.day
+predict_vector['Month'] = predict_vector['Date'].dt.month
+predict_vector['Year'] = predict_vector['Date'].dt.year
+predict_vector.drop('Date', axis = 1, inplace = True)   
+label_encoder = preprocessing.LabelEncoder()
+
+# Encode labels in column 'Size_Grade' in training data. 
+predict_vector['Size_Grade']= label_encoder.fit_transform(predict_vector['Size_Grade']) 
+
+# Encode labels in column 'Container' in training data
+predict_vector['Container']= label_encoder.fit_transform(predict_vector['Container'])   
+test = pd.get_dummies(predict_vector, drop_first=True)   
 
 # Convert our DataFrame to a JSON string.
 # This step is necessary in order to transmit our data via HTTP/S
