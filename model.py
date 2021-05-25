@@ -50,6 +50,7 @@ def _preprocess_data(data):
     feature_vector_dict = json.loads(data)
     # Load the dictionary as a Pandas DataFrame.
     feature_vector_df = pd.DataFrame.from_dict([feature_vector_dict])
+  
 
     # ---------------------------------------------------------------
     # NOTE: You will need to swap the lines below for your own data
@@ -61,8 +62,7 @@ def _preprocess_data(data):
 
     # ----------- Replace this code with your own preprocessing steps --------
     
-
-    feature_vector_df = feature_vector_df[(feature_vector_df['Commodities'] == 'APPLE GOLDEN DELICIOUS')]
+    feature_vector_df = feature_vector_df[feature_vector_df['Commodities']  == "APPLE GOLDEN DELICIOUS"]
     predict_vector = feature_vector_df
     predict_vector = predict_vector.reset_index(drop=True)
     predict_vector.drop('Commodities',axis = 1, inplace = True)   
