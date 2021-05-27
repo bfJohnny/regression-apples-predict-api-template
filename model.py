@@ -62,15 +62,11 @@ def _preprocess_data(data):
 
     # ----------- Replace this code with your own preprocessing steps --------
     
-    feature_vector_df = feature_vector_df[feature_vector_df['Commodities']  == "APPLE GOLDEN DELICIOUS"]
+    #feature_vector_df = feature_vector_df[feature_vector_df['Commodities']  == "APPLE GOLDEN DELICIOUS"]
     predict_vector = feature_vector_df
-    predict_vector = predict_vector.reset_index(drop=True)
-    predict_vector.drop('Commodities',axis = 1, inplace = True)   
-    predict_vector['Date'] = predict_vector['Date'].apply(lambda x: pd.to_datetime(x))
-    predict_vector['Day'] = predict_vector['Date'].dt.day
-    predict_vector['Month'] = predict_vector['Date'].dt.month
-    predict_vector['Year'] = predict_vector['Date'].dt.year
-    predict_vector.drop('Date', axis = 1, inplace = True)   
+    predict_vector.index.rename('Index',inplace=True)
+    predict_vector.index +=1
+    predict_vector.set_index('Index', inplace=True)
     label_encoder = preprocessing.LabelEncoder()
 
     # Encode labels in column 'Size_Grade' in training data. 
@@ -119,6 +115,7 @@ def make_prediction(data, model):
     """
     # Data preprocessing.
     prep_data = _preprocess_data(data)
+    prep_data.to_csv("Regression_AE5_DSFT.csv")
     # Perform prediction with model and preprocessed data.
     prediction = model.predict(prep_data)
     # Format as list for output standerdisation.
